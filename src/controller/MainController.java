@@ -154,6 +154,7 @@ public class MainController implements Initializable {
             resolveMethod.setFunction(function);
             resolveMethod.resolveByBiseccion();
             txtAreaProcedure.setText(resolveMethod.getProcedure());
+            txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.getRaiz());
             resolveMethod.restartProcedure();
         }catch(NumberFormatException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -177,6 +178,7 @@ public class MainController implements Initializable {
             resolveMethod.setFunction(function);
             resolveMethod.resolveByFalseRule();
             txtAreaProcedure.setText(resolveMethod.getProcedure());
+            txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.getRaiz());
             resolveMethod.restartProcedure();
         }catch(NumberFormatException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
