@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+   <children>
+      <HBox alignment="TOP_CENTER">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="y(x) =">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Text>
+            <TextField fx:id="txtFunction" prefHeight="23.0" prefWidth="209.0" promptText="Ej. x^2+5xsen(x)">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin></TextField>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Desde:" />
+            <TextField fx:id="txtFrom" prefHeight="22.0" prefWidth="84.0" promptText="Ej. 5">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </TextField>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hasta:" />
+            <TextField fx:id="txtTo" prefHeight="22.0" prefWidth="87.0" promptText="Ej. 10" />
+            <Button fx:id="btnShowGraphic" mnemonicParsing="false" text="Ver Grafica">
+               <HBox.margin>
+                  <Insets left="15.0" right="10.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets bottom="15.0" top="15.0" />
+         </padding>
+      </HBox>
+      <HBox alignment="TOP_CENTER">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="A: " />
+            <TextField fx:id="txtPointA" prefHeight="26.0" prefWidth="113.0">
+               <HBox.margin>
+                  <Insets right="15.0" />
+               </HBox.margin>
+            </TextField>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="B:" />
+            <TextField fx:id="txtPointB" prefHeight="26.0" prefWidth="114.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Error: ">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Text>
+            <TextField fx:id="txtError" prefHeight="26.0" prefWidth="72.0" promptText="ej. 0.01">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </TextField>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="\%" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets top="5.0" />
+               </HBox.margin>
+            </Text>
+         </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER">
+         <children>
+            <Button fx:id="btnBisection" mnemonicParsing="false" text="Biseccion">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnFalseRule" mnemonicParsing="false" text="Regla Falsa" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="10.0" top="10.0" />
+         </padding>
+      </HBox>
+      <TextArea fx:id="txtAreaProcedure" editable="false" prefWidth="700.0" VBox.vgrow="ALWAYS" />
+   </children>
+</VBox>

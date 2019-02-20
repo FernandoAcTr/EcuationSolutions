@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Biseccion:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Biseccion_jar</output-path>
+    <root id="archive" name="Biseccion.jar">
+      <element id="module-output" name="Biseccion" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../Librerias/JbcParser4_3/JbcParser.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../Librerias/jfreechart-1.0.19/lib/jcommon-1.0.23.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../Librerias/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
