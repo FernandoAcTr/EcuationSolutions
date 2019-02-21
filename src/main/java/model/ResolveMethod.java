@@ -1,4 +1,4 @@
-package modelo;
+package model;
 
 import java.text.DecimalFormat;
 
@@ -117,8 +117,12 @@ public class ResolveMethod {
         procedure += "\n"+lineProcedure;
     }
 
-    public double getRaiz(){
+    public double getRoot(){
         return Xr;
+    }
+
+    public String toStringRoot(double root){
+        return formatter.format(root);
     }
 
     public String getProcedure(){

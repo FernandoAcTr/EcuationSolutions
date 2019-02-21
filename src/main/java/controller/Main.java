@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/vista/layout_main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/layout_main.fxml"));
         primaryStage.setTitle("Metodos Cerrados");
         primaryStage.setScene(new Scene(root, 730, 500));
         primaryStage.show();

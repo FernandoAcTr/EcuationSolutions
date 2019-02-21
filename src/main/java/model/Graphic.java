@@ -1,7 +1,5 @@
-package modelo;
+package model;
 
-import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;

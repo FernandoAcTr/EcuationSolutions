@@ -1,9 +1,7 @@
-package modelo;
+package model;
 
 import com.bestcode.mathparser.IMathParser;
 import com.bestcode.mathparser.MathParserFactory;
-import javafx.scene.control.Alert;
-
 
 public class Function {
     private String function;

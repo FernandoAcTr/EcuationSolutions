@@ -8,9 +8,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import modelo.ResolveMethod;
-import modelo.Function;
-import modelo.Graphic;
+import model.ResolveMethod;
+import model.Function;
+import model.Graphic;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,7 +53,6 @@ public class MainController implements Initializable {
     Graphic graphic;
     ResolveMethod resolveMethod;
 
-    @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -65,21 +64,18 @@ public class MainController implements Initializable {
         resolveMethod = new ResolveMethod();
 
         btnShowGraphic.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
             public void handle(ActionEvent event) {
                 showGraphic();
             }
         });
 
         btnBisection.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
             public void handle(ActionEvent event) {
                 resolveByBiseccion();
             }
         });
 
         btnFalseRule.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
             public void handle(ActionEvent event) {
                 resolveByFalseRule();
             }
@@ -154,7 +150,7 @@ public class MainController implements Initializable {
             resolveMethod.setFunction(function);
             resolveMethod.resolveByBiseccion();
             txtAreaProcedure.setText(resolveMethod.getProcedure());
-            txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.getRaiz());
+            txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.toStringRoot(resolveMethod.getRoot()));
             resolveMethod.restartProcedure();
         }catch(NumberFormatException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -178,7 +174,7 @@ public class MainController implements Initializable {
             resolveMethod.setFunction(function);
             resolveMethod.resolveByFalseRule();
             txtAreaProcedure.setText(resolveMethod.getProcedure());
-            txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.getRaiz());
+            txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.toStringRoot(resolveMethod.getRoot()));
             resolveMethod.restartProcedure();
         }catch(NumberFormatException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);

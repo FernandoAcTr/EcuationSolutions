@@ -1,4 +1,4 @@
-package modelo;
+package model;
 
 public class Test {
     public static void main(String[] args){
@@ -11,7 +11,7 @@ public class Test {
             resolveMethod.setErrorPermited(0.01);
             resolveMethod.resolveByBiseccion();
             System.out.println(resolveMethod.getProcedure());
-            System.out.println("Raiz: "+ resolveMethod.getRaiz());
+            System.out.println("Raiz: "+ resolveMethod.getRoot());
         }catch (Exception e){
             e.printStackTrace();
         }
