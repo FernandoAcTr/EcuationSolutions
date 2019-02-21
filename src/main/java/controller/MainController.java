@@ -4,16 +4,25 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import model.ResolveMethod;
 import model.Function;
 import model.Graphic;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -50,6 +59,16 @@ public class MainController implements Initializable {
     @FXML
     private TextArea txtAreaProcedure;
 
+    @FXML
+    private MenuItem mnuClose;
+
+    @FXML
+    private MenuItem mnuHelp;
+
+    @FXML
+    private MenuItem mnuAbout;
+
+
     Graphic graphic;
     ResolveMethod resolveMethod;
 
@@ -78,6 +97,47 @@ public class MainController implements Initializable {
         btnFalseRule.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
                 resolveByFalseRule();
+            }
+        });
+
+        mnuClose.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                System.exit(0);
+            }
+        });
+
+        mnuHelp.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                String information = "Usar los siguientes simbolos: "
+                        + "\n Potencias: ^"
+                        + "\n Seno: SenH: sin(), sinh()"
+                        + "\n Cosen: CosH: cos(), cosh()"
+                        + "\n Tangente: tan()"
+                        + "\n Cotangente: cotan()"
+                        + "\n Absoluto: abs()"
+                        + "\n logaritmo: log(), ln()"
+                        + "\n logaritmo base N: logN(n,x)"
+                        + "\n Raiz: sqrt()"
+                        + "\n Los signos de agrupacion aceptados son: (), {}, []"
+                        + "\n Nota: Los productos no se aceptan sin signo * (ej. 2x --> 2*x)"
+                        + "\n Ejemplo: 3*x^3 + 5*x^2 - 2*x + sin(x)";
+
+                Stage stage = new Stage();
+                VBox root = new VBox();
+                root.setAlignment(Pos.CENTER);
+                root.setSpacing(15);
+                Label lblInfo = new Label(information);
+                final Button btnAcept = new Button("Aceptar");
+                btnAcept.setOnAction(new EventHandler<ActionEvent>() {
+                    public void handle(ActionEvent event) {
+                       ((Stage) btnAcept.getScene().getWindow()).close();
+                    }
+                });
+                root.getChildren().addAll(lblInfo,btnAcept);
+                Scene scene = new Scene(root,500,250);
+                stage.setScene(scene);
+                stage.setResizable(false);
+                stage.show();
             }
         });
     }
@@ -114,24 +174,8 @@ public class MainController implements Initializable {
             graphicFrame.setVisible(true);
 
         } catch (Exception ex) {
-            String information = "Usar los siguientes simbolos: "
-                    + "\n Potencias: ^"
-                    + "\n Seno: SenH: sin(), sinh()"
-                    + "\n Cosen: CosH: cos(), cosh()"
-                    + "\n Tangente: tan()"
-                    + "\n Cotangente: cotan()"
-                    + "\n Absoluto: abs()"
-                    + "\n logaritmo: log(), ln()"
-                    + "\n logaritmo base N: logN(n,x)"
-                    + "\n Raiz: sqrt()"
-                    + "\n Los signos de agrupacion aceptados son: (), {}, []"
-                    + "\n Nota: Los productos no se aceptan sin signo * (ej. 2x --> 2*x)";
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Por favor checa la entrada de la función");
-            alert.setContentText(information);
-            alert.show();
+            showMessage("",
+                    "Error","Por favor revisa la ayuda acerca de como ingresar la funcion", Alert.AlertType.ERROR);
             ex.printStackTrace();
         }
     }
@@ -153,10 +197,8 @@ public class MainController implements Initializable {
             txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.toStringRoot(resolveMethod.getRoot()));
             resolveMethod.restartProcedure();
         }catch(NumberFormatException e){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Asegurate de ingresar: punto A, punto B, Error");
-            alert.show();
+            showMessage("Asegurate de ingresar: punto A, punto B, Error","Error","", Alert.AlertType.WARNING);
+
         }
     }
 
@@ -177,11 +219,16 @@ public class MainController implements Initializable {
             txtAreaProcedure.appendText("\nRaíz: "+resolveMethod.toStringRoot(resolveMethod.getRoot()));
             resolveMethod.restartProcedure();
         }catch(NumberFormatException e){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Asegurate de ingresar: punto A, punto B, Error");
-            alert.show();
+            showMessage("Asegurate de ingresar: punto A, punto B, Error","Error","", Alert.AlertType.WARNING);
         }
+    }
+
+    private void showMessage(String message,String title,String header,Alert.AlertType type){
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.show();
     }
 
 }
