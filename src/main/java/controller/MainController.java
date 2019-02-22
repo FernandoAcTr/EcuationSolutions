@@ -3,26 +3,26 @@ package controller;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.ResolveMethod;
 import model.Function;
 import model.Graphic;
+import model.ResolveMethod;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -73,12 +73,6 @@ public class MainController implements Initializable {
     ResolveMethod resolveMethod;
 
     public void initialize(URL location, ResourceBundle resources) {
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText("Instituto Tecnológico de Celaya\nProyecto Primer Parcial\nMétodos Numéricos");
-        alert.setContentText("Luis Fernando Acosta Tovar\nGabriela Martínez Tort");
-        alert.show();
-
         graphic = new Graphic();
         resolveMethod = new ResolveMethod();
 
@@ -122,10 +116,12 @@ public class MainController implements Initializable {
                         + "\n Nota: Los productos no se aceptan sin signo * (ej. 2x --> 2*x)"
                         + "\n Ejemplo: 3*x^3 + 5*x^2 - 2*x + sin(x)";
 
-                Stage stage = new Stage();
+
                 VBox root = new VBox();
                 root.setAlignment(Pos.CENTER);
                 root.setSpacing(15);
+                root.getStyleClass().setAll("alert","alert-info");
+
                 Label lblInfo = new Label(information);
                 final Button btnAcept = new Button("Aceptar");
                 btnAcept.setOnAction(new EventHandler<ActionEvent>() {
@@ -133,11 +129,29 @@ public class MainController implements Initializable {
                        ((Stage) btnAcept.getScene().getWindow()).close();
                     }
                 });
+
                 root.getChildren().addAll(lblInfo,btnAcept);
-                Scene scene = new Scene(root,500,250);
+                Scene scene = new Scene(root,500,300);
+                scene.getStylesheets().add("org/kordamp/bootstrapfx/bootstrapfx.css");
+
+                Stage stage = new Stage();
                 stage.setScene(scene);
                 stage.setResizable(false);
                 stage.show();
+            }
+        });
+
+        mnuAbout.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                Stage stage = new Stage();
+                try {
+                    Parent root = FXMLLoader.load(getClass().getResource("/fxml/layout_about.fxml"));
+                    Scene scene = new Scene(root,420,360);
+                    stage.setScene(scene);
+                    stage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

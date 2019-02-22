@@ -2,10 +2,14 @@
   <artifact type="jar" name="Biseccion:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Biseccion_jar</output-path>
     <root id="archive" name="Biseccion.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
       <element id="module-output" name="Biseccion" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/kordamp/bootstrapfx/bootstrapfx-core/0.2.4/bootstrapfx-core-0.2.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jfree/jcommon/1.0.23/jcommon-1.0.23.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../../../Librerias/JbcParser4_3/JbcParser.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../../../Librerias/jfreechart-1.0.19/lib/jcommon-1.0.23.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../../../Librerias/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
