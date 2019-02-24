@@ -25,6 +25,9 @@ public class ResolveMethod {
         formatter = new DecimalFormat("0.000000");
     }
 
+    /**
+     * Resuelve la funcion por medio del metodo de biseccion
+     */
     public void resolveByBiseccion(){
         double error = Double.POSITIVE_INFINITY;
         int i = 1;
@@ -64,6 +67,9 @@ public class ResolveMethod {
         }catch (Exception ex){};
     }
 
+    /**
+     * Resuelve la funcion cpor el metodo de falsa regla
+     */
     public void resolveByFalseRule(){
         double error = Double.POSITIVE_INFINITY;
         int i = 1;

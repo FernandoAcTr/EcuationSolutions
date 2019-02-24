@@ -14,20 +14,27 @@ public class Graphic {
     private String title;
     private String lableX;
     private String lableY;
-    XYSeriesCollection collectionData= new XYSeriesCollection();
+    private XYSeriesCollection collectionData;
 
     public Graphic(String title, String lableX, String lableY) {
         this.title = title;
         this.lableX = lableX;
         this.lableY = lableY;
+        collectionData = new XYSeriesCollection();
         graphic = ChartFactory.createXYLineChart(title,lableX,lableY,collectionData,
                 PlotOrientation.VERTICAL,true,true,true);
     }
 
     public Graphic(){
-        this("Sin titulo...", "X", "Y");
+        this("", "X", "Y");
     }
 
+    /**
+     * Agrega una grafica de una funcion, a la coleccion de graficas
+     * @param id - id de la funcion
+     * @param xValues - conjunto de valores de x a graficar
+     * @param yValues - conjunto de valores de soluciones para los valores de x
+     */
     public void addGraphic(String id, double xValues[], double yValues[]){
         XYSeries serie = new XYSeries(id);
         int numValues = xValues.length;
@@ -36,11 +43,21 @@ public class Graphic {
         collectionData.addSeries(serie);
     }
 
+    /**
+     * Crea una grafica de una funcion, a la coleccion de graficas
+     * @param id - id de la funcion
+     * @param xValues - conjunto de valores de x a graficar
+     * @param yValues - conjunto de valores de soluciones para los valores de x
+     */
     public void createGraphic(String id, double xValues[], double yValues[]){
         collectionData.removeAllSeries();
         addGraphic(id,xValues,yValues);
     }
 
+    /**
+     * Regresa Un panel que contiene la gráfica
+     * @return gráfica como instancia de JPanel
+     */
     public JPanel getGraphic(){
         return new ChartPanel(graphic);
     }
