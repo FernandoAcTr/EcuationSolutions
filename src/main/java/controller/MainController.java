@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -8,25 +9,22 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.FileFunction;
 import model.Function;
-import model.Graphic;
+import model.GraphicData;
 import model.ResolveMethod;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
 
@@ -83,16 +81,22 @@ public class MainController implements Initializable {
     @FXML
     private MenuItem mnuSaveAs;
 
-    Graphic graphic;
+    @FXML
+    LineChart<Number, Number> lineChart;
+
+    @FXML
+    TabPane tabPane;
+
     ResolveMethod resolveMethod;
     FileFunction fileFunction;
     FileChooser fileChooser;
+    byte selectedPoint; //control sobre el que punto es seleccionado, si el A o el B
 
     public void initialize(URL location, ResourceBundle resources) {
-        graphic = new Graphic();
+        selectedPoint = 1;
+
         resolveMethod = new ResolveMethod();
         fileFunction = new FileFunction();
-
         fileChooser = new FileChooser();
         fileChooser.setInitialFileName("*.func");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Function File", "*.func"));
@@ -168,9 +172,8 @@ public class MainController implements Initializable {
     }
 
     private void showGraphic() {
-        double from = 0, to = 0;
+        double from, to;
         String def = txtFunction.getText();
-        double increment = 0.01;
         Function function = new Function(def);
 
         try {
@@ -185,18 +188,36 @@ public class MainController implements Initializable {
         }
 
         try {
-            double xValues[] = function.generateRange(from, to, increment);
+            double xValues[] = function.generateRange(from, to, 0.01);
             double yValues[] = function.evaluateFrom(xValues);
-            graphic.createGraphic(def, xValues, yValues);
+            GraphicData graphicData = new GraphicData();
+            Thread dataThread = new Thread();
 
-            JFrame graphicFrame = new JFrame();
-            graphicFrame.setLayout(new FlowLayout());
-            graphicFrame.setLocation(0, 0);
-            graphicFrame.setSize(700, 500);
-            graphicFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            graphicFrame.add(graphic.getGraphic());
-            graphicFrame.setResizable(false);
-            graphicFrame.setVisible(true);
+            ObservableList ob = graphicData.getChartData(def, xValues, yValues);
+
+            lineChart.setData(ob);
+
+            final DecimalFormat formatter = new DecimalFormat("#.###");
+
+            for (int i = 0; i < lineChart.getData().size(); i++)
+                for(final XYChart.Data data : lineChart.getData().get(i).getData()){
+
+                    Tooltip.install(data.getNode(), new Tooltip("X: "+formatter.format(data.getXValue())+" Y: "+formatter.format(data.getYValue())));
+
+                    data.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        public void handle(MouseEvent event) {
+                            if(selectedPoint == 1) {
+                                txtPointA.setText(formatter.format(data.getXValue()));
+                                selectedPoint = 2;
+                            }else{
+                                txtPointB.setText(formatter.format(data.getXValue()));
+                                selectedPoint = 1;
+                            }
+                        }
+                    });
+                }
+
+            tabPane.getSelectionModel().selectNext();
 
         } catch (Exception ex) {
             showMessage("",
@@ -298,7 +319,7 @@ public class MainController implements Initializable {
     }
 
     private void mnuSaveAction(Stage stage) {
-        if(fileFunction.getFunctionFile() != null){
+        if (fileFunction.getFunctionFile() != null) {
             String f = txtFunction.getText() != null ? txtFunction.getText() : "";
             String from = txtFrom.getText() != null ? txtFrom.getText() : "";
             String to = txtTo.getText() != null ? txtTo.getText() : "";
@@ -309,13 +330,13 @@ public class MainController implements Initializable {
             fileFunction.openFile(fileFunction.getFunctionFile());
             fileFunction.saveFunction(new FileFunction.BeanFunction(f, from, to, a, b, e, p));
             fileFunction.closeFile();
-        }else
+        } else
             mnuSaveAsAction(stage);
     }
 
     private void mnuSaveAsAction(Stage stage) {
         fileChooser.setTitle("Save As...");
-        File file = refactorFilaName(fileChooser.showSaveDialog(stage));
+        File file = refactorFileName(fileChooser.showSaveDialog(stage));
         if (file != null) {
             String f = txtFunction.getText() != null ? txtFunction.getText() : "";
             String from = txtFrom.getText() != null ? txtFrom.getText() : "";
@@ -330,10 +351,10 @@ public class MainController implements Initializable {
         }
     }
 
-    private void mnuOpenAction(Stage stage){
+    private void mnuOpenAction(Stage stage) {
         fileChooser.setTitle("Open");
         File file = fileChooser.showOpenDialog(stage);
-        if(file != null){
+        if (file != null) {
             fileFunction.openFile(file);
             FileFunction.BeanFunction bean = fileFunction.readFunction();
             txtFunction.setText(bean.getFunction());
@@ -347,7 +368,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private File refactorFilaName(File file) {
+    private File refactorFileName(File file) {
         File refactorFile = file;
         if (file != null)
             if (!file.getName().endsWith(".func"))
