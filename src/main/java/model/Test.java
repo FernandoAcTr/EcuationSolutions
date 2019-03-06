@@ -6,10 +6,8 @@ public class Test {
         ResolveMethod resolveMethod = new ResolveMethod(function);
 
         try {
-            resolveMethod.setPointA(4.2);
-            resolveMethod.setPointB(4.4);
             resolveMethod.setErrorPermited(0.01);
-            resolveMethod.resolveByBiseccion();
+            resolveMethod.resolveByBiseccion(4.2,4.4);
             System.out.println(resolveMethod.getProcedure());
             System.out.println("Raiz: "+ resolveMethod.getRoot());
         }catch (Exception e){
