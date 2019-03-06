@@ -7,6 +7,7 @@ public class Function {
     private String function;
     private IMathParser parser;
 
+
     public Function(String function) {
         this.function = function;
         parser = MathParserFactory.create();
@@ -55,5 +56,9 @@ public class Function {
             from += increment;
         }
         return range;
+    }
+
+    public String getFunction() {
+        return function;
     }
 }

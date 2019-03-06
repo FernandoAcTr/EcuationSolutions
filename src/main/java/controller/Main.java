@@ -11,11 +11,10 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/layout_main.fxml"));
-        Scene scene = new Scene(root, 730, 500);
+        Scene scene = new Scene(root, 730, 600);
         scene.getStylesheets().add("org/kordamp/bootstrapfx/bootstrapfx.css");
         primaryStage.setTitle("Metodos Cerrados");
         primaryStage.setScene(scene);
-
         primaryStage.show();
     }
 

@@ -45,13 +45,22 @@ public class FileFunction {
     public void saveFunction(FileFunction.BeanFunction beanFunction){
         try {
             randomFile.seek(0);
+            randomFile.writeByte(beanFunction.typeMethod);
             randomFile.writeUTF(beanFunction.function);
             randomFile.writeUTF(beanFunction.from);
             randomFile.writeUTF(beanFunction.to);
             randomFile.writeUTF(beanFunction.pointA);
-            randomFile.writeUTF(beanFunction.pointB);
-            randomFile.writeUTF(beanFunction.error);
-            randomFile.writeUTF(beanFunction.procedure);
+
+            if(beanFunction.typeMethod == BeanFunction.BISECCION || beanFunction.typeMethod == BeanFunction.FALSE_RULE){
+                randomFile.writeUTF(beanFunction.pointB);
+                randomFile.writeUTF(beanFunction.error);
+                randomFile.writeUTF(beanFunction.procedure);
+            }else if (beanFunction.typeMethod == BeanFunction.PUNTO_FIJO || beanFunction.typeMethod == BeanFunction.NEWTON){
+                randomFile.writeUTF(beanFunction.error);
+                randomFile.writeUTF(beanFunction.extraFunction);
+                randomFile.writeUTF(beanFunction.procedure);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,14 +72,27 @@ public class FileFunction {
     public FileFunction.BeanFunction readFunction(){
         BeanFunction bean = null;
         try {
+            byte type = randomFile.readByte();
             String function = randomFile.readUTF();
             String from = randomFile.readUTF();
             String to = randomFile.readUTF();
             String pointA = randomFile.readUTF();
-            String pointB = randomFile.readUTF();
-            String error = randomFile.readUTF();
-            String procedure = randomFile.readUTF();
-            bean = new BeanFunction(function,from,to,pointA,pointB,error,procedure);
+
+            if(type == BeanFunction.BISECCION || type == BeanFunction.FALSE_RULE){
+                String pointB = randomFile.readUTF();
+                String error = randomFile.readUTF();
+                String procedure = randomFile.readUTF();
+                bean = new BeanFunction(type, function,from,to,pointA,pointB,error,procedure);
+            }else if(type == BeanFunction.PUNTO_FIJO || type == BeanFunction.NEWTON){
+                String error = randomFile.readUTF();
+                String extraFun = randomFile.readUTF();
+                String procedure = randomFile.readUTF();
+                bean = new BeanFunction(type, function,from,to,pointA,error,procedure);
+                bean.setExtraFunction(extraFun);
+            }
+
+           return bean;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,6 +114,7 @@ public class FileFunction {
      * Clase que sirve de contenedor de los valores de la interfaz grafica
      */
     public static class BeanFunction{
+        private byte typeMethod;
         private String function;
         private String from;
         private String to;
@@ -99,13 +122,32 @@ public class FileFunction {
         private String pointB;
         private String procedure;
         private String error;
+        private String extraFunction;
 
-        public BeanFunction(String function, String from, String to, String pointA, String pointB, String procedure, String error) {
+        //estas constantes deben coincidir con los indices del ComboBox de metodos de solucion
+        public static final byte BISECCION = 0;
+        public static final byte FALSE_RULE = 1;
+        public static final byte PUNTO_FIJO = 2;
+        public static final byte NEWTON = 3;
+
+        public BeanFunction(byte typeMethod, String function, String from, String to, String pointA,
+                            String pointB, String procedure, String error) {
+            this.typeMethod = typeMethod;
             this.function = function;
             this.from = from;
             this.to = to;
             this.pointA = pointA;
             this.pointB = pointB;
+            this.procedure = procedure;
+            this.error = error;
+        }
+
+        public BeanFunction(byte typeMethod, String function, String from, String to, String pointA, String error, String procedure) {
+            this.typeMethod = typeMethod;
+            this.function = function;
+            this.from = from;
+            this.to = to;
+            this.pointA = pointA;
             this.procedure = procedure;
             this.error = error;
         }
@@ -136,6 +178,18 @@ public class FileFunction {
 
         public String getError() {
             return error;
+        }
+
+        public byte getTypeMethod() {
+            return typeMethod;
+        }
+
+        public String getExtraFunction() {
+            return extraFunction;
+        }
+
+        public void setExtraFunction(String extraFunction) {
+            this.extraFunction = extraFunction;
         }
     }
 }
