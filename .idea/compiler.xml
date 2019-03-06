@@ -16,11 +16,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Biseccion" />
+        <module name="EcuationSolutions" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="Biseccion" target="1.5" />
+      <module name="EcuationSolutions" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

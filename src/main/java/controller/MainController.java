@@ -1,5 +1,7 @@
 package controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,6 +15,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -34,7 +37,7 @@ public class MainController implements Initializable {
     private TextField txtFunction;
 
     @FXML
-    private Button btnShowGraphic;
+    private Button btnShowGraphic, btnResolve;
 
     @FXML
     private TextField txtFrom;
@@ -43,19 +46,7 @@ public class MainController implements Initializable {
     private TextField txtTo;
 
     @FXML
-    private TextField txtPointA;
-
-    @FXML
-    private TextField txtPointB;
-
-    @FXML
-    private TextField txtError;
-
-    @FXML
-    private Button btnBisection;
-
-    @FXML
-    private Button btnFalseRule;
+    private Label lblMethod;
 
     @FXML
     private TextArea txtAreaProcedure;
@@ -85,37 +76,30 @@ public class MainController implements Initializable {
     LineChart<Number, Number> lineChart;
 
     @FXML
-    TabPane tabPane;
+    private VBox paneMethod;
+
+    @FXML
+    private ComboBox<String> cmbMethod;
+
+    @FXML
+    private TabPane tabPane;
+
+    private TextField txtPointA, txtPointB, txtError;
+    private TextField txtPointAOpen, txtDerived, txtGFunction;
+    private HBox paneCloseMethod, paneNewtonMethod, paneFixedPointMethod;
 
     ResolveMethod resolveMethod;
     FileFunction fileFunction;
     FileChooser fileChooser;
-    byte selectedPoint; //control sobre el que punto es seleccionado, si el A o el B
 
     public void initialize(URL location, ResourceBundle resources) {
-        selectedPoint = 1;
 
-        resolveMethod = new ResolveMethod();
-        fileFunction = new FileFunction();
-        fileChooser = new FileChooser();
-        fileChooser.setInitialFileName("*.func");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Function File", "*.func"));
+
+        initData();
 
         btnShowGraphic.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
                 showGraphic();
-            }
-        });
-
-        btnBisection.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                btnBiseccionAction();
-            }
-        });
-
-        btnFalseRule.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                btnFalseRuleAction();
             }
         });
 
@@ -153,13 +137,15 @@ public class MainController implements Initializable {
 
         mnuSaveAs.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
-                mnuSaveAsAction((Stage) btnShowGraphic.getScene().getWindow());
+
+                mnuSaveAction((Stage) btnShowGraphic.getScene().getWindow(), false);
             }
         });
 
         mnuSave.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
-                mnuSaveAction((Stage) btnShowGraphic.getScene().getWindow());
+
+                mnuSaveAction((Stage) btnShowGraphic.getScene().getWindow(), true);
             }
         });
 
@@ -169,16 +155,62 @@ public class MainController implements Initializable {
             }
         });
 
+        btnResolve.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                btnResolveAction();
+            }
+        });
+
+        buildClosedPane();
+        cmbMethod.valueProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.equals("Bisección") || newValue.equals("Regla Falsa"))
+                    buildClosedPane();
+                else if (newValue.equals("Punto Fijo"))
+                    buildFixedPointPane();
+                else if (newValue.equals("Newton-Raphson"))
+                    buildNewtonPane();
+
+                txtAreaProcedure.clear();
+            }
+        });
+
+    }
+
+    private void initData() {
+        resolveMethod = new ResolveMethod();
+        fileFunction = new FileFunction();
+        fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("*.func");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Function File", "*.func"));
+
+        cmbMethod.getItems().add("Bisección");
+        cmbMethod.getItems().add("Regla Falsa");
+        cmbMethod.getItems().add("Punto Fijo");
+        cmbMethod.getItems().add("Newton-Raphson");
+
+        try {
+            paneCloseMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_closed_method.fxml"));
+            paneNewtonMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_newton_method.fxml"));
+            paneFixedPointMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_fixedpoint_method.fxml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        cmbMethod.getSelectionModel().selectFirst();
+
     }
 
     private void showGraphic() {
         double from, to;
         String def = txtFunction.getText();
         Function function = new Function(def);
+        double increment;
 
         try {
             from = Double.parseDouble(txtFrom.getText());
             to = Double.parseDouble(txtTo.getText());
+            increment = Math.abs(from - to) / 800;
         } catch (NumberFormatException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -188,11 +220,9 @@ public class MainController implements Initializable {
         }
 
         try {
-            double xValues[] = function.generateRange(from, to, 0.01);
+            double xValues[] = function.generateRange(from, to, increment);
             double yValues[] = function.evaluateFrom(xValues);
             GraphicData graphicData = new GraphicData();
-            Thread dataThread = new Thread();
-
             ObservableList ob = graphicData.getChartData(def, xValues, yValues);
 
             lineChart.setData(ob);
@@ -200,33 +230,16 @@ public class MainController implements Initializable {
             final DecimalFormat formatter = new DecimalFormat("#.###");
 
             for (int i = 0; i < lineChart.getData().size(); i++)
-                for(final XYChart.Data data : lineChart.getData().get(i).getData()){
-
-                    Tooltip.install(data.getNode(), new Tooltip("X: "+formatter.format(data.getXValue())+" Y: "+formatter.format(data.getYValue())));
-
-                    data.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        public void handle(MouseEvent event) {
-                            if(selectedPoint == 1) {
-                                txtPointA.setText(formatter.format(data.getXValue()));
-                                selectedPoint = 2;
-                            }else{
-                                txtPointB.setText(formatter.format(data.getXValue()));
-                                selectedPoint = 1;
-                            }
-                        }
-                    });
-                }
-
-            tabPane.getSelectionModel().selectNext();
+                for (final XYChart.Data data : lineChart.getData().get(i).getData())
+                    Tooltip.install(data.getNode(), new Tooltip("X: " + formatter.format(data.getXValue()) + " Y: " + formatter.format(data.getYValue())));
 
         } catch (Exception ex) {
             showMessage("",
                     "Error", "Por favor revisa la ayuda acerca de como ingresar la funcion", Alert.AlertType.ERROR);
-            ex.printStackTrace();
         }
     }
 
-    private void btnBiseccionAction() {
+    private void biseccionAction() {
         try {
             String def = txtFunction.getText().trim();
             double pointA = Double.parseDouble(txtPointA.getText());
@@ -234,11 +247,10 @@ public class MainController implements Initializable {
             double error = Double.parseDouble(txtError.getText());
             Function function = new Function(def);
 
-            resolveMethod.setPointA(pointA);
-            resolveMethod.setPointB(pointB);
+            resolveMethod.initCloseProcedure();
             resolveMethod.setErrorPermited(error);
             resolveMethod.setFunction(function);
-            resolveMethod.resolveByBiseccion();
+            resolveMethod.resolveByBiseccion(pointA, pointB);
             txtAreaProcedure.setText(resolveMethod.getProcedure());
             txtAreaProcedure.appendText("\nRaíz: " + resolveMethod.toStringRoot(resolveMethod.getRoot()));
             resolveMethod.restartProcedure();
@@ -247,7 +259,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void btnFalseRuleAction() {
+    private void falseRuleAction() {
         try {
             String def = txtFunction.getText().trim();
             double pointA = Double.parseDouble(txtPointA.getText());
@@ -255,16 +267,59 @@ public class MainController implements Initializable {
             double error = Double.parseDouble(txtError.getText());
             Function function = new Function(def);
 
-            resolveMethod.setPointA(pointA);
-            resolveMethod.setPointB(pointB);
+            resolveMethod.initCloseProcedure();
             resolveMethod.setErrorPermited(error);
             resolveMethod.setFunction(function);
-            resolveMethod.resolveByFalseRule();
+            resolveMethod.resolveByFalseRule(pointA, pointB);
             txtAreaProcedure.setText(resolveMethod.getProcedure());
             txtAreaProcedure.appendText("\nRaíz: " + resolveMethod.toStringRoot(resolveMethod.getRoot()));
             resolveMethod.restartProcedure();
         } catch (NumberFormatException e) {
             showMessage("Asegurate de ingresar: punto A, punto B, Error", "Error", "", Alert.AlertType.WARNING);
+        }
+    }
+
+    private void fixedPointAction() {
+        try {
+            String def = txtFunction.getText().trim();
+            String gFunc = txtGFunction.getText().trim();
+            double pointX = Double.parseDouble(txtPointAOpen.getText());
+            double error = Double.parseDouble(txtError.getText());
+            Function function = new Function(def);
+            Function gFunction = new Function(gFunc);
+
+            resolveMethod.initFixedPointProcedure();
+            resolveMethod.setErrorPermited(error);
+            resolveMethod.setFunction(function);
+            resolveMethod.resolveByFixedPoint(gFunction, pointX);
+            txtAreaProcedure.setText(resolveMethod.getProcedure());
+            txtAreaProcedure.appendText("\nRaíz: " + resolveMethod.toStringRoot(resolveMethod.getRoot()));
+            resolveMethod.restartProcedure();
+
+        } catch (NumberFormatException e) {
+            showMessage("Asegurate de ingresar: Funcion g(x), punto A, Error", "Error", "", Alert.AlertType.WARNING);
+        }
+    }
+
+    private void newtonAction() {
+        try {
+            String def = txtFunction.getText().trim();
+            String dFunc = txtDerived.getText().trim();
+            double pointX = Double.parseDouble(txtPointAOpen.getText());
+            double error = Double.parseDouble(txtError.getText());
+            Function function = new Function(def);
+            Function dFunction = new Function(dFunc);
+
+            resolveMethod.initNewtonProcedure();
+            resolveMethod.setErrorPermited(error);
+            resolveMethod.setFunction(function);
+            resolveMethod.resolveByNewtonRaphson(dFunction, pointX);
+            txtAreaProcedure.setText(resolveMethod.getProcedure());
+            txtAreaProcedure.appendText("\nRaíz: " + resolveMethod.toStringRoot(resolveMethod.getRoot()));
+            resolveMethod.restartProcedure();
+
+        } catch (NumberFormatException e) {
+            showMessage("Asegurate de ingresar: Funcion g(x), punto A, Error", "Error", "", Alert.AlertType.WARNING);
         }
     }
 
@@ -307,6 +362,17 @@ public class MainController implements Initializable {
         stage.show();
     }
 
+    private void btnResolveAction() {
+        if (cmbMethod.getSelectionModel().getSelectedIndex() == 0)
+            biseccionAction();
+        else if (cmbMethod.getSelectionModel().getSelectedIndex() == 1)
+            falseRuleAction();
+        else if (cmbMethod.getSelectionModel().getSelectedIndex() == 2)
+            fixedPointAction();
+        else
+            newtonAction();
+    }
+
     private void cleanAll() {
         txtAreaProcedure.setText("");
         txtError.setText("");
@@ -315,29 +381,20 @@ public class MainController implements Initializable {
         txtPointA.setText("");
         txtPointB.setText("");
         txtTo.setText("");
+        if (txtPointAOpen != null) txtPointAOpen.setText("");
+        if (txtDerived != null) txtDerived.setText("");
+        if (txtGFunction != null) txtGFunction.setText("");
+        lineChart.getData().clear();
+        tabPane.getSelectionModel().selectFirst();
         fileFunction.restartFile();
     }
 
-    private void mnuSaveAction(Stage stage) {
-        if (fileFunction.getFunctionFile() != null) {
-            String f = txtFunction.getText() != null ? txtFunction.getText() : "";
-            String from = txtFrom.getText() != null ? txtFrom.getText() : "";
-            String to = txtTo.getText() != null ? txtTo.getText() : "";
-            String a = txtPointA.getText() != null ? txtPointA.getText() : "";
-            String b = txtPointB.getText() != null ? txtPointB.getText() : "";
-            String e = txtError.getText() != null ? txtError.getText() : "";
-            String p = txtAreaProcedure.getText() != null ? txtAreaProcedure.getText() : "";
-            fileFunction.openFile(fileFunction.getFunctionFile());
-            fileFunction.saveFunction(new FileFunction.BeanFunction(f, from, to, a, b, e, p));
-            fileFunction.closeFile();
-        } else
-            mnuSaveAsAction(stage);
-    }
+    private void mnuSaveAction(Stage stage, boolean typeSave) {
+        boolean save = false;
+        byte typeMethod = (byte) cmbMethod.getSelectionModel().getSelectedIndex();
+        FileFunction.BeanFunction beanFunction = null;
 
-    private void mnuSaveAsAction(Stage stage) {
-        fileChooser.setTitle("Save As...");
-        File file = refactorFileName(fileChooser.showSaveDialog(stage));
-        if (file != null) {
+        if (typeMethod == FileFunction.BeanFunction.BISECCION || typeMethod == FileFunction.BeanFunction.FALSE_RULE) {
             String f = txtFunction.getText() != null ? txtFunction.getText() : "";
             String from = txtFrom.getText() != null ? txtFrom.getText() : "";
             String to = txtTo.getText() != null ? txtTo.getText() : "";
@@ -345,11 +402,50 @@ public class MainController implements Initializable {
             String b = txtPointB.getText() != null ? txtPointB.getText() : "";
             String e = txtError.getText() != null ? txtError.getText() : "";
             String p = txtAreaProcedure.getText() != null ? txtAreaProcedure.getText() : "";
-            fileFunction.openFile(file);
-            fileFunction.saveFunction(new FileFunction.BeanFunction(f, from, to, a, b, e, p));
+            beanFunction = new FileFunction.BeanFunction(typeMethod, f, from, to, a, b, e, p);
+
+        } else if (typeMethod == FileFunction.BeanFunction.PUNTO_FIJO) {
+
+            String f = txtFunction.getText() != null ? txtFunction.getText() : "";
+            String from = txtFrom.getText() != null ? txtFrom.getText() : "";
+            String to = txtTo.getText() != null ? txtTo.getText() : "";
+            String a = txtPointAOpen.getText() != null ? txtPointA.getText() : "";
+            String e = txtError.getText() != null ? txtError.getText() : "";
+            String p = txtAreaProcedure.getText() != null ? txtAreaProcedure.getText() : "";
+            String gFun = txtGFunction.getText() != null ? txtGFunction.getText() : "";
+            beanFunction = new FileFunction.BeanFunction(typeMethod, f, from, to, a, e, p);
+            beanFunction.setExtraFunction(gFun);
+
+        } else if (typeMethod == FileFunction.BeanFunction.NEWTON) {
+            String f = txtFunction.getText() != null ? txtFunction.getText() : "";
+            String from = txtFrom.getText() != null ? txtFrom.getText() : "";
+            String to = txtTo.getText() != null ? txtTo.getText() : "";
+            String a = txtPointAOpen.getText() != null ? txtPointAOpen.getText() : "";
+            String e = txtError.getText() != null ? txtError.getText() : "";
+            String p = txtAreaProcedure.getText() != null ? txtAreaProcedure.getText() : "";
+            String dFun = txtDerived.getText() != null ? txtDerived.getText() : "";
+            beanFunction = new FileFunction.BeanFunction(typeMethod, f, from, to, a, e, p);
+            beanFunction.setExtraFunction(dFun);
+        }
+
+        if (fileFunction.getFunctionFile() != null && typeSave) {
+            fileFunction.openFile(fileFunction.getFunctionFile());
+            save = true;
+        } else {
+            fileChooser.setTitle("Save As...");
+            File file = refactorFileName(fileChooser.showSaveDialog(stage));
+            if (file != null) {
+                fileFunction.openFile(file);
+                save = true;
+            }
+        }
+
+        if (save) {
+            fileFunction.saveFunction(beanFunction);
             fileFunction.closeFile();
         }
     }
+
 
     private void mnuOpenAction(Stage stage) {
         fileChooser.setTitle("Open");
@@ -357,13 +453,35 @@ public class MainController implements Initializable {
         if (file != null) {
             fileFunction.openFile(file);
             FileFunction.BeanFunction bean = fileFunction.readFunction();
+            byte type = bean.getTypeMethod();
+
             txtFunction.setText(bean.getFunction());
             txtFrom.setText(bean.getFrom());
             txtTo.setText(bean.getTo());
-            txtPointA.setText(bean.getPointA());
-            txtPointB.setText(bean.getPointB());
-            txtError.setText(bean.getError());
-            txtAreaProcedure.setText(bean.getProcedure());
+
+            if (type == FileFunction.BeanFunction.BISECCION || type == FileFunction.BeanFunction.FALSE_RULE) {
+                buildClosedPane();
+                txtPointA.setText(bean.getPointA());
+                txtPointB.setText(bean.getPointB());
+                txtError.setText(bean.getError());
+                txtAreaProcedure.setText(bean.getProcedure());
+
+            } else if (type == FileFunction.BeanFunction.PUNTO_FIJO) {
+                buildFixedPointPane();
+                txtPointAOpen.setText(bean.getPointA());
+                txtError.setText(bean.getError());
+                txtAreaProcedure.setText(bean.getProcedure());
+                txtGFunction.setText(bean.getExtraFunction());
+
+            } else if (type == FileFunction.BeanFunction.NEWTON) {
+                buildNewtonPane();
+                txtPointAOpen.setText(bean.getPointA());
+                txtError.setText(bean.getError());
+                txtAreaProcedure.setText(bean.getProcedure());
+                txtDerived.setText(bean.getExtraFunction());
+            }
+
+            cmbMethod.getSelectionModel().select(type);
             fileFunction.closeFile();
         }
     }
@@ -383,6 +501,33 @@ public class MainController implements Initializable {
         alert.setHeaderText(header);
         alert.setContentText(message);
         alert.show();
+    }
+
+    private void buildClosedPane() {
+        txtPointA = (TextField) paneCloseMethod.getChildren().get(1);
+        txtPointB = (TextField) paneCloseMethod.getChildren().get(3);
+        txtError = (TextField) paneCloseMethod.getChildren().get(5);
+        paneMethod.getChildren().set(1, paneCloseMethod);
+        lblMethod.setText("Métodos Cerrados");
+        txtPointA.requestFocus();
+    }
+
+    private void buildFixedPointPane() {
+        txtGFunction = (TextField) paneFixedPointMethod.getChildren().get(1);
+        txtPointAOpen = (TextField) paneFixedPointMethod.getChildren().get(3);
+        txtError = (TextField) paneFixedPointMethod.getChildren().get(5);
+        paneMethod.getChildren().set(1, paneFixedPointMethod);
+        lblMethod.setText("Métodos Abiertos");
+        txtGFunction.requestFocus();
+    }
+
+    private void buildNewtonPane() {
+        txtDerived = (TextField) paneNewtonMethod.getChildren().get(1);
+        txtPointAOpen = (TextField) paneNewtonMethod.getChildren().get(3);
+        txtError = (TextField) paneNewtonMethod.getChildren().get(5);
+        paneMethod.getChildren().set(1, paneNewtonMethod);
+        lblMethod.setText("Métodos Abiertos");
+        txtDerived.requestFocus();
     }
 
 }
