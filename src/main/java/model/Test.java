@@ -6,10 +6,12 @@ public class Test {
         ResolveMethod resolveMethod = new ResolveMethod(function);
 
         try {
-            resolveMethod.setErrorPermited(0.01);
+           /* resolveMethod.setErrorPermited(0.01);
             resolveMethod.resolveByBiseccion(4.2,4.4);
             System.out.println(resolveMethod.getProcedure());
-            System.out.println("Raiz: "+ resolveMethod.getRoot());
+            System.out.println("Raiz: "+ resolveMethod.getRoot());*/
+           double b = function.evaluateFrom(5);
+            System.out.println(b);
         }catch (Exception e){
             e.printStackTrace();
         }

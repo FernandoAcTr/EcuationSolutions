@@ -58,7 +58,9 @@ public class ResolveMethod {
 
             } while (error > errorPermited);
 
-        }catch (Exception ex){};
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -100,7 +102,9 @@ public class ResolveMethod {
 
             } while (error > errorPermited);
 
-        }catch (Exception ex){};
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -131,7 +135,9 @@ public class ResolveMethod {
 
             } while (error > errorPermited);
 
-        }catch (Exception ex){};
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -165,8 +171,11 @@ public class ResolveMethod {
                 concatNewtonProcedure(i,pointC,funC,dfunC,Xr,error);
             } while (error > errorPermited);
 
-        }catch (Exception ex){};
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
+
 
     public void resolveBySecant(double a, double b){
         double error;
@@ -192,7 +201,6 @@ public class ResolveMethod {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Concatena al procedimiento un renglon más del procedimiento, para metodos cerrados

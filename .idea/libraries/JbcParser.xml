@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="JbcParser">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../../Librerias/JbcParser4_3/JbcParser.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

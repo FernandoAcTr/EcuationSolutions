@@ -14,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -86,6 +85,7 @@ public class MainController implements Initializable {
 
     private TextField txtPointA, txtPointB, txtError;
     private TextField txtPointAOpen, txtDerived, txtGFunction;
+
     private HBox paneCloseMethod, paneNewtonMethod, paneFixedPointMethod, paneSecantMethod;
 
     ResolveMethod resolveMethod;
@@ -197,6 +197,7 @@ public class MainController implements Initializable {
             paneNewtonMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_newton_method.fxml"));
             paneFixedPointMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_fixedpoint_method.fxml"));
             paneSecantMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_secant_method.fxml"));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -244,6 +245,7 @@ public class MainController implements Initializable {
     }
 
     private void biseccionAction() {
+
         try {
             String def = txtFunction.getText().trim();
             double pointA = Double.parseDouble(txtPointA.getText());
@@ -397,7 +399,6 @@ public class MainController implements Initializable {
             newtonAction();
         else if (cmbMethod.getSelectionModel().getSelectedIndex() == 4)
             secantAction();
-
     }
 
     private void cleanAll() {
@@ -421,8 +422,10 @@ public class MainController implements Initializable {
         byte typeMethod = (byte) cmbMethod.getSelectionModel().getSelectedIndex();
         FileFunction.BeanFunction beanFunction = null;
 
+
         if (typeMethod == FileFunction.BeanFunction.BISECCION || typeMethod == FileFunction.BeanFunction.FALSE_RULE
                 || typeMethod == FileFunction.BeanFunction.SECANT) {
+
             String f = txtFunction.getText() != null ? txtFunction.getText() : "";
             String from = txtFrom.getText() != null ? txtFrom.getText() : "";
             String to = txtTo.getText() != null ? txtTo.getText() : "";
@@ -437,7 +440,7 @@ public class MainController implements Initializable {
             String f = txtFunction.getText() != null ? txtFunction.getText() : "";
             String from = txtFrom.getText() != null ? txtFrom.getText() : "";
             String to = txtTo.getText() != null ? txtTo.getText() : "";
-            String a = txtPointAOpen.getText() != null ? txtPointA.getText() : "";
+            String a = txtPointAOpen.getText() != null ? txtPointAOpen.getText() : "";
             String e = txtError.getText() != null ? txtError.getText() : "";
             String p = txtAreaProcedure.getText() != null ? txtAreaProcedure.getText() : "";
             String gFun = txtGFunction.getText() != null ? txtGFunction.getText() : "";
@@ -507,6 +510,7 @@ public class MainController implements Initializable {
                 txtError.setText(bean.getError());
                 txtAreaProcedure.setText(bean.getProcedure());
                 txtDerived.setText(bean.getExtraFunction());
+
             }else if (type == FileFunction.BeanFunction.SECANT){
                 buildSecantPane();
                 txtPointA.setText(bean.getPointA());
