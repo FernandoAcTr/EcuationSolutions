@@ -168,6 +168,31 @@ public class ResolveMethod {
         }catch (Exception ex){};
     }
 
+    public void resolveBySecant(double a, double b){
+        double error;
+        int i = 1;
+        double valueForA, valueForB;
+
+        try {
+            valueForA = function.evaluateFrom(a);
+            do {
+                valueForB = function.evaluateFrom(b);
+                Xr = b - (valueForB * (a - b) / (valueForA - valueForB));
+                error = Math.abs((Xr - b) / Xr) * 100;
+
+                concatSecantMethod(i,a,b,valueForA,valueForB,Xr,error);
+
+                a = b;
+                b = Xr;
+                valueForA = valueForB;
+                i++;
+
+            }while (error > errorPermited);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Concatena al procedimiento un renglon más del procedimiento, para metodos cerrados
@@ -198,6 +223,9 @@ public class ResolveMethod {
         procedure += "\n"+lineProcedure;
     }
 
+    /**
+     * Concatena al procedimiento un renglon más del procedimiento, para el metodo de Newthon-Rapson
+     */
     private void concatNewtonProcedure(int i, double pointC, double valueF,double valueFPrime, double Xr, double error){
         String c = formatter.format(pointC);
         String f = formatter.format(valueF);
@@ -206,6 +234,22 @@ public class ResolveMethod {
         String err = formatter.format(error);
 
         String lineProcedure = String.format("%-8s\t%-19s\t%-19s\t%-19s\t%-19s\t%-19s",i, c, f, df, xr,err);
+        procedure += "\n"+lineProcedure;
+    }
+
+    /**
+     * Concatena al procedimiento un renglon más del procedimiento, para el metodo de la secante
+     */
+    private void concatSecantMethod(int i, double pointA, double pointB, double valueForA, double valueForB, double Xr, double error){
+        String a = formatter.format(pointA);
+        String b = formatter.format(pointB);
+        String valA = formatter.format(valueForA);
+        String valB = formatter.format(valueForB);
+        String xr = formatter.format(Xr);
+        String err = formatter.format(error);
+
+        String lineProcedure = String.format("%-3s\t%10s\t%10s\t%10s\t%10s\t%10s\t%10s\t",i, a, b, valA,
+                valB, xr, err);
         procedure += "\n"+lineProcedure;
     }
 
@@ -240,6 +284,11 @@ public class ResolveMethod {
 
     public void initNewtonProcedure(){
         procedure = String.format("%-6s\t%-25s\t%-25s\t%-25s\t%-25s\t%-25s","No", "Xi", "f(Xi)", "f'(Xi)", "Xr", "error");
+    }
+
+    public void initSecantProcedure(){
+        procedure = String.format("%-6s\t%-16s\t%-16s\t%-16s\t%-16s\t%-16s\t%-16s\t","No", "a", "b", "f(a)",
+                "f(b)", "Xr", "error");
     }
 
     public void restartProcedure() {

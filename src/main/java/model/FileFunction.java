@@ -51,7 +51,8 @@ public class FileFunction {
             randomFile.writeUTF(beanFunction.to);
             randomFile.writeUTF(beanFunction.pointA);
 
-            if(beanFunction.typeMethod == BeanFunction.BISECCION || beanFunction.typeMethod == BeanFunction.FALSE_RULE){
+            if(beanFunction.typeMethod == BeanFunction.BISECCION || beanFunction.typeMethod == BeanFunction.FALSE_RULE ||
+            beanFunction.typeMethod == BeanFunction.SECANT){
                 randomFile.writeUTF(beanFunction.pointB);
                 randomFile.writeUTF(beanFunction.error);
                 randomFile.writeUTF(beanFunction.procedure);
@@ -78,7 +79,7 @@ public class FileFunction {
             String to = randomFile.readUTF();
             String pointA = randomFile.readUTF();
 
-            if(type == BeanFunction.BISECCION || type == BeanFunction.FALSE_RULE){
+            if(type == BeanFunction.BISECCION || type == BeanFunction.FALSE_RULE || type == BeanFunction.SECANT){
                 String pointB = randomFile.readUTF();
                 String error = randomFile.readUTF();
                 String procedure = randomFile.readUTF();
@@ -129,6 +130,7 @@ public class FileFunction {
         public static final byte FALSE_RULE = 1;
         public static final byte PUNTO_FIJO = 2;
         public static final byte NEWTON = 3;
+        public static final byte SECANT = 4;
 
         public BeanFunction(byte typeMethod, String function, String from, String to, String pointA,
                             String pointB, String procedure, String error) {

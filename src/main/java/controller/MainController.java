@@ -86,7 +86,7 @@ public class MainController implements Initializable {
 
     private TextField txtPointA, txtPointB, txtError;
     private TextField txtPointAOpen, txtDerived, txtGFunction;
-    private HBox paneCloseMethod, paneNewtonMethod, paneFixedPointMethod;
+    private HBox paneCloseMethod, paneNewtonMethod, paneFixedPointMethod, paneSecantMethod;
 
     ResolveMethod resolveMethod;
     FileFunction fileFunction;
@@ -170,6 +170,8 @@ public class MainController implements Initializable {
                     buildFixedPointPane();
                 else if (newValue.equals("Newton-Raphson"))
                     buildNewtonPane();
+                else if(newValue.equals("Método de la secante"))
+                    buildSecantPane();
 
                 txtAreaProcedure.clear();
             }
@@ -188,11 +190,13 @@ public class MainController implements Initializable {
         cmbMethod.getItems().add("Regla Falsa");
         cmbMethod.getItems().add("Punto Fijo");
         cmbMethod.getItems().add("Newton-Raphson");
+        cmbMethod.getItems().add("Método de la secante");
 
         try {
             paneCloseMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_closed_method.fxml"));
             paneNewtonMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_newton_method.fxml"));
             paneFixedPointMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_fixedpoint_method.fxml"));
+            paneSecantMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_secant_method.fxml"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -323,6 +327,26 @@ public class MainController implements Initializable {
         }
     }
 
+    private void secantAction(){
+        try {
+            String def = txtFunction.getText().trim();
+            double pointA = Double.parseDouble(txtPointA.getText());
+            double pointB = Double.parseDouble(txtPointB.getText());
+            double error = Double.parseDouble(txtError.getText());
+            Function function = new Function(def);
+
+            resolveMethod.initSecantProcedure();
+            resolveMethod.setErrorPermited(error);
+            resolveMethod.setFunction(function);
+            resolveMethod.resolveBySecant(pointA, pointB);
+            txtAreaProcedure.setText(resolveMethod.getProcedure());
+            txtAreaProcedure.appendText("\nRaíz: " + resolveMethod.toStringRoot(resolveMethod.getRoot()));
+            resolveMethod.restartProcedure();
+        } catch (NumberFormatException e) {
+            showMessage("Asegurate de ingresar: punto A, punto B, Error", "Error", "", Alert.AlertType.WARNING);
+        }
+    }
+
     private void showHelpMessage() {
         String information = "Usar los siguientes simbolos: "
                 + "\n Potencias: ^"
@@ -369,8 +393,11 @@ public class MainController implements Initializable {
             falseRuleAction();
         else if (cmbMethod.getSelectionModel().getSelectedIndex() == 2)
             fixedPointAction();
-        else
+        else if(cmbMethod.getSelectionModel().getSelectedIndex() == 3)
             newtonAction();
+        else if (cmbMethod.getSelectionModel().getSelectedIndex() == 4)
+            secantAction();
+
     }
 
     private void cleanAll() {
@@ -394,7 +421,8 @@ public class MainController implements Initializable {
         byte typeMethod = (byte) cmbMethod.getSelectionModel().getSelectedIndex();
         FileFunction.BeanFunction beanFunction = null;
 
-        if (typeMethod == FileFunction.BeanFunction.BISECCION || typeMethod == FileFunction.BeanFunction.FALSE_RULE) {
+        if (typeMethod == FileFunction.BeanFunction.BISECCION || typeMethod == FileFunction.BeanFunction.FALSE_RULE
+                || typeMethod == FileFunction.BeanFunction.SECANT) {
             String f = txtFunction.getText() != null ? txtFunction.getText() : "";
             String from = txtFrom.getText() != null ? txtFrom.getText() : "";
             String to = txtTo.getText() != null ? txtTo.getText() : "";
@@ -479,6 +507,12 @@ public class MainController implements Initializable {
                 txtError.setText(bean.getError());
                 txtAreaProcedure.setText(bean.getProcedure());
                 txtDerived.setText(bean.getExtraFunction());
+            }else if (type == FileFunction.BeanFunction.SECANT){
+                buildSecantPane();
+                txtPointA.setText(bean.getPointA());
+                txtPointB.setText(bean.getPointB());
+                txtError.setText(bean.getError());
+                txtAreaProcedure.setText(bean.getProcedure());
             }
 
             cmbMethod.getSelectionModel().select(type);
@@ -528,6 +562,15 @@ public class MainController implements Initializable {
         paneMethod.getChildren().set(1, paneNewtonMethod);
         lblMethod.setText("Métodos Abiertos");
         txtDerived.requestFocus();
+    }
+
+    private void buildSecantPane() {
+        txtPointA = (TextField) paneSecantMethod.getChildren().get(1);
+        txtPointB = (TextField) paneSecantMethod.getChildren().get(3);
+        txtError = (TextField) paneSecantMethod.getChildren().get(5);
+        paneMethod.getChildren().set(1, paneSecantMethod);
+        lblMethod.setText("Métodos Abiertos");
+        txtPointA.requestFocus();
     }
 
 }

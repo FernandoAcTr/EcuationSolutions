@@ -11,6 +11,12 @@ public class Function {
     public Function(String function) {
         this.function = function;
         parser = MathParserFactory.create();
+        try {
+            parser.createDefaultVars();
+            parser.createConstant("e", Math.E);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         parser.setExpression(function);
     }
 
