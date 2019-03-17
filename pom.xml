@@ -15,6 +15,12 @@
            <artifactId>bootstrapfx-core</artifactId>
            <version>0.2.4</version>
        </dependency>
+
+       <dependency>
+           <groupId>net.objecthunter</groupId>
+           <artifactId>exp4j</artifactId>
+           <version>0.4.8</version>
+       </dependency>
    </dependencies>
 
     <!--Bootstrap-->

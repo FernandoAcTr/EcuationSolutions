@@ -1,23 +1,20 @@
 package model;
 
-import com.bestcode.mathparser.IMathParser;
-import com.bestcode.mathparser.MathParserFactory;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+import net.objecthunter.exp4j.ValidationResult;
 
 public class Function {
     private String function;
-    private IMathParser parser;
+    private Expression expression;
 
 
     public Function(String function) {
         this.function = function;
-        parser = MathParserFactory.create();
-        try {
-            parser.createDefaultVars();
-            parser.createConstant("e", Math.E);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        parser.setExpression(function);
+        expression = new ExpressionBuilder(function)
+                    .implicitMultiplication(true)
+                    .variable("x")
+                    .build();
     }
 
     /**
@@ -28,8 +25,14 @@ public class Function {
      */
     public double evaluateFrom(double value) throws Exception {
         double result = Double.NaN;
-        parser.setX(value);
-        result = parser.getValue();
+        expression.setVariable("x", value);
+
+        ValidationResult validation = expression.validate();
+        if(!validation.isValid()){
+            throw new Exception("La expresión es inválida");
+        }
+
+        result = expression.evaluate();
         return result;
     }
 

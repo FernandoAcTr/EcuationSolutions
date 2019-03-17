@@ -360,9 +360,9 @@ public class MainController implements Initializable {
                 + "\n logaritmo: log(), ln()"
                 + "\n logaritmo base N: logN(n,x)"
                 + "\n Raiz: sqrt()"
-                + "\n Los signos de agrupacion aceptados son: (), {}, []"
-                + "\n Nota: Los productos no se aceptan sin signo * (ej. 2x --> 2*x)"
-                + "\n Ejemplo: 3*x^3 + 5*x^2 - 2*x + sin(x)";
+                + "\n Los signos de agrupacion aceptados son: (), {}, []";
+
+
 
 
         VBox root = new VBox();
@@ -415,8 +415,14 @@ public class MainController implements Initializable {
         lineChart.getData().clear();
         tabPane.getSelectionModel().selectFirst();
         fileFunction.restartFile();
+        ((Stage)txtFunction.getParent().getScene().getWindow()).setTitle("Nuevo Documento");
     }
 
+    /**
+     * Guarda una funcion
+     * @param stage
+     * @param typeSave True para Guardar. False para Guardar como...
+     */
     private void mnuSaveAction(Stage stage, boolean typeSave) {
         boolean save = false;
         byte typeMethod = (byte) cmbMethod.getSelectionModel().getSelectedIndex();
@@ -474,6 +480,7 @@ public class MainController implements Initializable {
         if (save) {
             fileFunction.saveFunction(beanFunction);
             fileFunction.closeFile();
+            ((Stage)txtFunction.getParent().getScene().getWindow()).setTitle(fileFunction.getFunctionFile().getName());
         }
     }
 
@@ -521,6 +528,7 @@ public class MainController implements Initializable {
 
             cmbMethod.getSelectionModel().select(type);
             fileFunction.closeFile();
+            ((Stage)txtFunction.getParent().getScene().getWindow()).setTitle(file.getName());
         }
     }
 

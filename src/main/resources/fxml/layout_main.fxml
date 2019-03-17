@@ -58,7 +58,7 @@
                                           <Insets right="10.0" />
                                        </HBox.margin>
                                     </Text>
-                                    <TextField fx:id="txtFunction" prefHeight="23.0" prefWidth="209.0" promptText="Ej. x^2+5*x*sen(x)" styleClass="text">
+                                    <TextField fx:id="txtFunction" prefHeight="23.0" prefWidth="209.0" promptText="Ej. x^2+5x*sin(x)" styleClass="text">
                                        <opaqueInsets>
                                           <Insets />
                                        </opaqueInsets>
@@ -128,19 +128,19 @@
                               <HBox fx:id="paneOpenMethod" alignment="TOP_CENTER" scaleShape="false">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text-info" text="A: " />
-                                    <TextField fx:id="txtPointA" prefHeight="26.0" prefWidth="113.0">
+                                    <TextField prefHeight="26.0" prefWidth="113.0">
                                        <HBox.margin>
                                           <Insets right="15.0" />
                                        </HBox.margin>
                                     </TextField>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text-info" text="B:" />
-                                    <TextField fx:id="txtPointB" prefHeight="26.0" prefWidth="114.0" />
+                                    <TextField prefHeight="26.0" prefWidth="114.0" />
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text-info" text="Error: ">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </Text>
-                                    <TextField fx:id="txtError" prefHeight="26.0" prefWidth="72.0" promptText="ej. 0.01">
+                                    <TextField  prefHeight="26.0" prefWidth="72.0" promptText="ej. 0.01">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
