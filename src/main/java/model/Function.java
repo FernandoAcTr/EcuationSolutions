@@ -44,9 +44,11 @@ public class Function {
      */
     public double[] evaluateFrom(double[] values) throws Exception{
         double results[] = new double[values.length];
+
         for (int i = 0; i < results.length; i++) {
             results[i] = evaluateFrom(values[i]);
         }
+
         return results;
     }
 
@@ -58,12 +60,16 @@ public class Function {
      * @return conjunto de valores que conforman el rango
      */
     public double[] generateRange(double from, double to, double increment){
+
         int numValues = (int)(Math.abs(to-from)/increment);
+
         double range[] = new double[numValues];
+
         for (int i = 0; i < numValues; i++) {
             range[i] = from;
             from += increment;
         }
+
         return range;
     }
 

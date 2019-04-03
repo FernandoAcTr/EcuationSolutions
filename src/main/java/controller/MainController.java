@@ -1,5 +1,6 @@
 package controller;
 
+import com.jfoenix.controls.JFXTabPane;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -14,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -33,7 +35,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     @FXML
-    private TextField txtFunction;
+    private TextField txtFunction, txtFunctionMain;
 
     @FXML
     private Button btnShowGraphic, btnResolve;
@@ -81,7 +83,7 @@ public class MainController implements Initializable {
     private ComboBox<String> cmbMethod;
 
     @FXML
-    private TabPane tabPane;
+    private JFXTabPane tabPane;
 
     private TextField txtPointA, txtPointB, txtError;
     private TextField txtPointAOpen, txtDerived, txtGFunction;
@@ -94,8 +96,42 @@ public class MainController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
 
-
         initData();
+        initGUI();
+
+    }
+
+    private void initData() {
+        resolveMethod = new ResolveMethod();
+        fileFunction = new FileFunction();
+        fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("*.func");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Function File", "*.func"));
+
+
+        cmbMethod.getItems().add("Bisección");
+        cmbMethod.getItems().add("Regla Falsa");
+
+        cmbMethod.getItems().add("Punto Fijo");
+        cmbMethod.getItems().add("Newton-Raphson");
+        cmbMethod.getItems().add("Método de la secante");
+
+
+        try {
+            paneCloseMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_closed_method.fxml"));
+            paneNewtonMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_newton_method.fxml"));
+            paneFixedPointMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_fixedpoint_method.fxml"));
+            paneSecantMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_secant_method.fxml"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        cmbMethod.getSelectionModel().selectFirst();
+
+    }
+
+    private void initGUI() {
 
         btnShowGraphic.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
@@ -161,50 +197,31 @@ public class MainController implements Initializable {
             }
         });
 
+
         buildClosedPane();
+
         cmbMethod.valueProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (newValue.equals("Bisección") || newValue.equals("Regla Falsa"))
+                if (newValue.equalsIgnoreCase("Bisección") || newValue.equalsIgnoreCase("Regla Falsa"))
                     buildClosedPane();
-                else if (newValue.equals("Punto Fijo"))
+                else if (newValue.equalsIgnoreCase("Punto Fijo"))
                     buildFixedPointPane();
-                else if (newValue.equals("Newton-Raphson"))
+                else if (newValue.equalsIgnoreCase("Newton-Raphson"))
                     buildNewtonPane();
-                else if(newValue.equals("Método de la secante"))
+                else if (newValue.equalsIgnoreCase("Método de la secante"))
                     buildSecantPane();
 
                 txtAreaProcedure.clear();
             }
         });
 
+        txtFunction.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent event) {
+                txtFunctionMain.setText(txtFunction.getText());
+            }
+        });
     }
 
-    private void initData() {
-        resolveMethod = new ResolveMethod();
-        fileFunction = new FileFunction();
-        fileChooser = new FileChooser();
-        fileChooser.setInitialFileName("*.func");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Function File", "*.func"));
-
-        cmbMethod.getItems().add("Bisección");
-        cmbMethod.getItems().add("Regla Falsa");
-        cmbMethod.getItems().add("Punto Fijo");
-        cmbMethod.getItems().add("Newton-Raphson");
-        cmbMethod.getItems().add("Método de la secante");
-
-        try {
-            paneCloseMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_closed_method.fxml"));
-            paneNewtonMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_newton_method.fxml"));
-            paneFixedPointMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_fixedpoint_method.fxml"));
-            paneSecantMethod = FXMLLoader.load(getClass().getResource("/fxml/layout_secant_method.fxml"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        cmbMethod.getSelectionModel().selectFirst();
-
-    }
 
     private void showGraphic() {
         double from, to;
@@ -247,7 +264,7 @@ public class MainController implements Initializable {
     private void biseccionAction() {
 
         try {
-            String def = txtFunction.getText().trim();
+            String def = txtFunctionMain.getText().trim();
             double pointA = Double.parseDouble(txtPointA.getText());
             double pointB = Double.parseDouble(txtPointB.getText());
             double error = Double.parseDouble(txtError.getText());
@@ -267,7 +284,7 @@ public class MainController implements Initializable {
 
     private void falseRuleAction() {
         try {
-            String def = txtFunction.getText().trim();
+            String def = txtFunctionMain.getText().trim();
             double pointA = Double.parseDouble(txtPointA.getText());
             double pointB = Double.parseDouble(txtPointB.getText());
             double error = Double.parseDouble(txtError.getText());
@@ -287,7 +304,7 @@ public class MainController implements Initializable {
 
     private void fixedPointAction() {
         try {
-            String def = txtFunction.getText().trim();
+            String def = txtFunctionMain.getText().trim();
             String gFunc = txtGFunction.getText().trim();
             double pointX = Double.parseDouble(txtPointAOpen.getText());
             double error = Double.parseDouble(txtError.getText());
@@ -309,7 +326,7 @@ public class MainController implements Initializable {
 
     private void newtonAction() {
         try {
-            String def = txtFunction.getText().trim();
+            String def = txtFunctionMain.getText().trim();
             String dFunc = txtDerived.getText().trim();
             double pointX = Double.parseDouble(txtPointAOpen.getText());
             double error = Double.parseDouble(txtError.getText());
@@ -329,9 +346,9 @@ public class MainController implements Initializable {
         }
     }
 
-    private void secantAction(){
+    private void secantAction() {
         try {
-            String def = txtFunction.getText().trim();
+            String def = txtFunctionMain.getText().trim();
             double pointA = Double.parseDouble(txtPointA.getText());
             double pointB = Double.parseDouble(txtPointB.getText());
             double error = Double.parseDouble(txtError.getText());
@@ -352,18 +369,14 @@ public class MainController implements Initializable {
     private void showHelpMessage() {
         String information = "Usar los siguientes simbolos: "
                 + "\n Potencias: ^"
-                + "\n Seno: SenH: sin(), sinh()"
-                + "\n Cosen: CosH: cos(), cosh()"
+                + "\n Seno: sin(), sinh()"
+                + "\n Cosen: cos(), cosh()"
                 + "\n Tangente: tan()"
                 + "\n Cotangente: cotan()"
                 + "\n Absoluto: abs()"
-                + "\n logaritmo: log(), ln()"
-                + "\n logaritmo base N: logN(n,x)"
+                + "\n logaritmo base N: logn(x)"
                 + "\n Raiz: sqrt()"
                 + "\n Los signos de agrupacion aceptados son: (), {}, []";
-
-
-
 
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
@@ -395,7 +408,7 @@ public class MainController implements Initializable {
             falseRuleAction();
         else if (cmbMethod.getSelectionModel().getSelectedIndex() == 2)
             fixedPointAction();
-        else if(cmbMethod.getSelectionModel().getSelectedIndex() == 3)
+        else if (cmbMethod.getSelectionModel().getSelectedIndex() == 3)
             newtonAction();
         else if (cmbMethod.getSelectionModel().getSelectedIndex() == 4)
             secantAction();
@@ -406,6 +419,7 @@ public class MainController implements Initializable {
         txtError.setText("");
         txtFrom.setText("");
         txtFunction.setText("");
+        txtFunctionMain.setText("");
         txtPointA.setText("");
         txtPointB.setText("");
         txtTo.setText("");
@@ -415,11 +429,12 @@ public class MainController implements Initializable {
         lineChart.getData().clear();
         tabPane.getSelectionModel().selectFirst();
         fileFunction.restartFile();
-        ((Stage)txtFunction.getParent().getScene().getWindow()).setTitle("Nuevo Documento");
+        ((Stage) txtFunction.getParent().getScene().getWindow()).setTitle("Nuevo Documento");
     }
 
     /**
      * Guarda una funcion
+     *
      * @param stage
      * @param typeSave True para Guardar. False para Guardar como...
      */
@@ -480,7 +495,7 @@ public class MainController implements Initializable {
         if (save) {
             fileFunction.saveFunction(beanFunction);
             fileFunction.closeFile();
-            ((Stage)txtFunction.getParent().getScene().getWindow()).setTitle(fileFunction.getFunctionFile().getName());
+            ((Stage) txtFunction.getParent().getScene().getWindow()).setTitle(fileFunction.getFunctionFile().getName());
         }
     }
 
@@ -494,6 +509,7 @@ public class MainController implements Initializable {
             byte type = bean.getTypeMethod();
 
             txtFunction.setText(bean.getFunction());
+            txtFunctionMain.setText(bean.getFunction());
             txtFrom.setText(bean.getFrom());
             txtTo.setText(bean.getTo());
 
@@ -518,7 +534,7 @@ public class MainController implements Initializable {
                 txtAreaProcedure.setText(bean.getProcedure());
                 txtDerived.setText(bean.getExtraFunction());
 
-            }else if (type == FileFunction.BeanFunction.SECANT){
+            } else if (type == FileFunction.BeanFunction.SECANT) {
                 buildSecantPane();
                 txtPointA.setText(bean.getPointA());
                 txtPointB.setText(bean.getPointB());
@@ -528,7 +544,7 @@ public class MainController implements Initializable {
 
             cmbMethod.getSelectionModel().select(type);
             fileFunction.closeFile();
-            ((Stage)txtFunction.getParent().getScene().getWindow()).setTitle(file.getName());
+            ((Stage) txtFunction.getParent().getScene().getWindow()).setTitle(file.getName());
         }
     }
 
@@ -553,7 +569,7 @@ public class MainController implements Initializable {
         txtPointA = (TextField) paneCloseMethod.getChildren().get(1);
         txtPointB = (TextField) paneCloseMethod.getChildren().get(3);
         txtError = (TextField) paneCloseMethod.getChildren().get(5);
-        paneMethod.getChildren().set(1, paneCloseMethod);
+        paneMethod.getChildren().set(2, paneCloseMethod);
         lblMethod.setText("Métodos Cerrados");
         txtPointA.requestFocus();
     }
@@ -562,7 +578,7 @@ public class MainController implements Initializable {
         txtGFunction = (TextField) paneFixedPointMethod.getChildren().get(1);
         txtPointAOpen = (TextField) paneFixedPointMethod.getChildren().get(3);
         txtError = (TextField) paneFixedPointMethod.getChildren().get(5);
-        paneMethod.getChildren().set(1, paneFixedPointMethod);
+        paneMethod.getChildren().set(2, paneFixedPointMethod);
         lblMethod.setText("Métodos Abiertos");
         txtGFunction.requestFocus();
     }
@@ -571,7 +587,7 @@ public class MainController implements Initializable {
         txtDerived = (TextField) paneNewtonMethod.getChildren().get(1);
         txtPointAOpen = (TextField) paneNewtonMethod.getChildren().get(3);
         txtError = (TextField) paneNewtonMethod.getChildren().get(5);
-        paneMethod.getChildren().set(1, paneNewtonMethod);
+        paneMethod.getChildren().set(2, paneNewtonMethod);
         lblMethod.setText("Métodos Abiertos");
         txtDerived.requestFocus();
     }
@@ -580,7 +596,7 @@ public class MainController implements Initializable {
         txtPointA = (TextField) paneSecantMethod.getChildren().get(1);
         txtPointB = (TextField) paneSecantMethod.getChildren().get(3);
         txtError = (TextField) paneSecantMethod.getChildren().get(5);
-        paneMethod.getChildren().set(1, paneSecantMethod);
+        paneMethod.getChildren().set(2, paneSecantMethod);
         lblMethod.setText("Métodos Abiertos");
         txtPointA.requestFocus();
     }
